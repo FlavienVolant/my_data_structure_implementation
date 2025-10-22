@@ -18,27 +18,47 @@ void free_hashmap(struct hashmap *map)
     free(map);
 }
 
-int put(struct hashmap *map, int key, int value)
+enum HashMapReturnValue put(struct hashmap *map, int key, int value)
 {
     if(key < 0 || key >= VALUES_COUNT)
-        return -1;
+        return WRONG_KEY_VALUE;
 
     map->values[key] = value;
 
-    return 0;
+    return SUCCESS;
 }
 
-int get(struct hashmap *map, int key, int *res)
+enum HashMapReturnValue get(struct hashmap *map, int key, int *res)
 {
     if(key < 0 || key >= VALUES_COUNT)
-        return -1;
+        return WRONG_KEY_VALUE;
 
     int val = map->values[key];
 
     if(val == VALUE_EMPTY)
-        return -2;
+        return KEY_UNKNOW;
 
-    *res = val;
 
-    return 0;
+    if(res != NULL)
+        *res = val;
+
+    return SUCCESS;
+}
+
+enum HashMapReturnValue del(struct hashmap *map, int key, int *res)
+{
+    if(key < 0 || key >= VALUES_COUNT)
+        return WRONG_KEY_VALUE;
+    
+    int val = map -> values[key];
+
+    if(val == VALUE_EMPTY)
+        return KEY_UNKNOW;
+
+    map -> values[key] = VALUE_EMPTY;
+    
+    if(res != NULL)
+        *res = val;
+
+    return SUCCESS;
 }

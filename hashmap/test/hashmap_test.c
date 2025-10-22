@@ -41,7 +41,21 @@ void get_a_key_unknow_will_fail() {
     free_hashmap(map);
 }
 
+void put_a_key_then_del_give_the_value() {
+    struct hashmap *map = init_hashmap();
 
+    int key = 0;
+    int value = 0;
+    int res = -1;
+
+    put(map, key, value);
+
+    assert(del(map, key, &res) == 0);
+    assert(res == value);
+    assert(get(map, key, NULL) == -2);
+
+    free_hashmap(map);
+}
 
 
 int main() {
@@ -50,4 +64,7 @@ int main() {
     put_a_key_value_then_get_the_value_by_giving_the_key();
     put_a_key_bellow_zero_will_fail();
     get_a_key_unknow_will_fail();
+    put_a_key_then_del_give_the_value();
+
+    return 0;
 }
