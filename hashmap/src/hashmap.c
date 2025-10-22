@@ -33,7 +33,12 @@ int get(struct hashmap *map, int key, int *res)
     if(key < 0 || key >= VALUES_COUNT)
         return -1;
 
-    *res = map->values[key];
+    int val = map->values[key];
+
+    if(val == VALUE_EMPTY)
+        return -2;
+
+    *res = val;
 
     return 0;
 }

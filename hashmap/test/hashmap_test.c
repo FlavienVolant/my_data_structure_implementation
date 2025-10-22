@@ -23,11 +23,8 @@ void put_a_key_bellow_zero_will_fail() {
 
     int key = - 5;
     int value = 23;
-    int res = VALUE_EMPTY;
 
     assert(put(map, key, value) == -1);
-    assert(get(map, key, &res) == -1);
-    assert(res == VALUE_EMPTY);
 
     free_hashmap(map);
 }
@@ -36,13 +33,15 @@ void get_a_key_unknow_will_fail() {
     struct hashmap *map = init_hashmap();
 
     int key = 0;
-    int res = VALUE_EMPTY;
+    int res = -1;
 
-    assert(get(map, key, &res) == -1);
-    assert(res == VALUE_EMPTY);
+    assert(get(map, key, &res) == -2);
+    assert(res == -1);
     
     free_hashmap(map);
 }
+
+
 
 
 int main() {
@@ -50,4 +49,5 @@ int main() {
 
     put_a_key_value_then_get_the_value_by_giving_the_key();
     put_a_key_bellow_zero_will_fail();
+    get_a_key_unknow_will_fail();
 }
