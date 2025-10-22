@@ -14,6 +14,8 @@ void put_a_key_value_then_get_the_value_by_giving_the_key() {
     put(map, key, value);
     assert(get(map, key, &res) == 0);
     assert(res == value);
+
+    free_hashmap(map);
 }
 
 

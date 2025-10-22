@@ -1,21 +1,39 @@
 #include "hashmap.h"
 
+#include <stdlib.h>
+
 struct hashmap *init_hashmap()
 {
-    return 0;
+    struct hashmap *map = malloc(sizeof(struct hashmap));
+
+    for(int i = 0; i < VALUES_COUNT; i ++) {
+        map->values[i] = VALUE_EMPTY;
+    }
+
+    return map;
 }
 
-int destroy_hashmap(struct hashmap *map)
+void free_hashmap(struct hashmap *map)
 {
-    return 0;
+    free(map);
 }
 
 int put(struct hashmap *map, int key, int value)
 {
+    if(key < 0 && key >= VALUES_COUNT)
+        return -1;
+
+    map->values[key] = value;
+
     return 0;
 }
 
 int get(struct hashmap *map, int key, int *res)
 {
+    if(key < 0 && key >= VALUES_COUNT)
+        return -1;
+
+    *res = map->values[key];
+
     return 0;
 }

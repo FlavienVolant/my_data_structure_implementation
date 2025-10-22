@@ -3,7 +3,7 @@
 ## how to
 
 ```
-make run
+make test
 ```
 
 ## api
