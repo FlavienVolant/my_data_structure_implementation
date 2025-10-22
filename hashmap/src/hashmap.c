@@ -20,7 +20,7 @@ void free_hashmap(struct hashmap *map)
 
 int put(struct hashmap *map, int key, int value)
 {
-    if(key < 0 && key >= VALUES_COUNT)
+    if(key < 0 || key >= VALUES_COUNT)
         return -1;
 
     map->values[key] = value;
@@ -30,7 +30,7 @@ int put(struct hashmap *map, int key, int value)
 
 int get(struct hashmap *map, int key, int *res)
 {
-    if(key < 0 && key >= VALUES_COUNT)
+    if(key < 0 || key >= VALUES_COUNT)
         return -1;
 
     *res = map->values[key];
