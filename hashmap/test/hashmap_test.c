@@ -32,6 +32,18 @@ void put_a_key_bellow_zero_will_fail() {
     free_hashmap(map);
 }
 
+void get_a_key_unknow_will_fail() {
+    struct hashmap *map = init_hashmap();
+
+    int key = 0;
+    int res = VALUE_EMPTY;
+
+    assert(get(map, key, &res) == -1);
+    assert(res == VALUE_EMPTY);
+    
+    free_hashmap(map);
+}
+
 
 int main() {
     printf("Welcome to the hashmap test\n");
