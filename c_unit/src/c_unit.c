@@ -8,6 +8,7 @@ struct TestList *create_test_list()
     struct TestList *list = malloc(sizeof(struct TestList));
 
     list->head = NULL;
+    list->length = 0;
 
     return list;
 }
@@ -26,6 +27,8 @@ void append_test(struct TestList *list, testFunction f, char *testName){
     
     struct TestNode *new_node = _create_test_node(f, testName);
 
+    list->length++;
+
     struct TestNode *tail = list->head;
 
     if(tail == NULL) {
@@ -40,29 +43,47 @@ void append_test(struct TestList *list, testFunction f, char *testName){
     tail->next = new_node;
 }
 
-void run(testFunction f, _beforeEach before, _afterEach after)
+int run(testFunction f, _beforeEach before, _afterEach after)
 {
     void *params = before();
 
-    f(params);
+    int result = f(params);
 
     after(params);
+
+    return result;
 }
 
 void run_tests(struct TestList *list, _beforeEach before, _afterEach after){
 
     struct TestNode *current = list->head;
 
-    int c = 0;
+    int test_failed[list->length];
+
+    int passed = 0;
+    int count = 0;
 
     while(current != NULL) {
-        printf("Running test #%i : %s\n", ++c, current->testName);
-        run(current->f, before, after);
-        printf("Passed: %s\n\n", current->testName);
+        printf("Running test #%i : %s\n", count, current->testName);
+        if(run(current->f, before, after) == 0) {
+            passed ++;
+            printf("Passed\n\n");
+        } else {
+            test_failed[count - passed] = count;
+            printf("Failed\n\n");
+        }
+        count ++;
         current = current->next;
     }
 
-    printf("%i test succed\n", c);
+    printf("%i/%i tests passed\n", passed, count);
+    if(passed < count) {
+        printf("\nThe following tests failed:\n");
+        for(int i = 0; i < count - passed; i++) {
+            printf("#%i ", test_failed[i]);
+        }
+        printf("\n");
+    }
 }
 
 void free_test_list(struct TestList *list){
@@ -81,4 +102,5 @@ void _free_test_nodes(struct TestNode *node) {
 void clear_tests(struct TestList *list){
     _free_test_nodes(list->head);
     list->head = NULL;
+    list->length = 0;
 }
