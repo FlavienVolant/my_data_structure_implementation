@@ -67,10 +67,10 @@ void run_tests(struct TestList *list, _beforeEach before, _afterEach after){
         printf("Running test #%i : %s\n", count, current->testName);
         if(run(current->f, before, after) == 0) {
             passed ++;
-            printf("Passed\n\n");
+            printf("\033[32mPassed\033[0m\n\n");
         } else {
             test_failed[count - passed] = count;
-            printf("Failed\n\n");
+            printf("\033[31mFailed\033[0m\n\n");
         }
         count ++;
         current = current->next;
