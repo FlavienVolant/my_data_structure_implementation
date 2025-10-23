@@ -1,17 +1,19 @@
 #ifndef HASHMAP_H
 #define HASHMAP_H
 
-#define VALUES_COUNT 256
+#define DEFAULT_CAPACITY 256
+#define DEFAULT_LOAD_FACTOR 0.75
 #define VALUE_EMPTY -1
 
 struct hashmap {
-    int values[VALUES_COUNT];
+    int capacity;
+    int loadFactor;
+    int *values;
 };
 
 enum HashMapReturnValue {
     SUCCESS = 0,
-    WRONG_KEY_VALUE = -1,
-    KEY_UNKNOW = -2
+    KEY_UNKNOW = -1
 };
 
 struct hashmap* init_hashmap();

@@ -6,7 +6,12 @@ struct hashmap *init_hashmap()
 {
     struct hashmap *map = malloc(sizeof(struct hashmap));
 
-    for(int i = 0; i < VALUES_COUNT; i ++) {
+    map->capacity = DEFAULT_CAPACITY;
+    map->loadFactor = DEFAULT_LOAD_FACTOR;
+
+    map->values = malloc(sizeof(int) * map->capacity);
+
+    for(int i = 0; i < map->capacity; i ++) {
         map->values[i] = VALUE_EMPTY;
     }
 
@@ -15,25 +20,28 @@ struct hashmap *init_hashmap()
 
 void free_hashmap(struct hashmap *map)
 {
+    free(map->values);
     free(map);
+}
+
+unsigned int hash(struct hashmap *map, int key) {
+    return (unsigned int) key % map->capacity;
 }
 
 enum HashMapReturnValue put(struct hashmap *map, int key, int value)
 {
-    if(key < 0 || key >= VALUES_COUNT)
-        return WRONG_KEY_VALUE;
+    unsigned int hash_key = hash(map, key);
 
-    map->values[key] = value;
+    map->values[hash_key] = value;
 
     return SUCCESS;
 }
 
 enum HashMapReturnValue get(struct hashmap *map, int key, int *res)
 {
-    if(key < 0 || key >= VALUES_COUNT)
-        return WRONG_KEY_VALUE;
+    unsigned int hash_key = hash(map, key);
 
-    int val = map->values[key];
+    int val = map->values[hash_key];
 
     if(val == VALUE_EMPTY)
         return KEY_UNKNOW;
@@ -47,15 +55,14 @@ enum HashMapReturnValue get(struct hashmap *map, int key, int *res)
 
 enum HashMapReturnValue del(struct hashmap *map, int key, int *res)
 {
-    if(key < 0 || key >= VALUES_COUNT)
-        return WRONG_KEY_VALUE;
+    unsigned int hash_key = hash(map, key);
     
-    int val = map -> values[key];
+    int val = map -> values[hash_key];
 
     if(val == VALUE_EMPTY)
         return KEY_UNKNOW;
 
-    map -> values[key] = VALUE_EMPTY;
+    map -> values[hash_key] = VALUE_EMPTY;
     
     if(res != NULL)
         *res = val;
