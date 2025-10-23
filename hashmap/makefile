@@ -16,5 +16,9 @@ test: $(TESTSRC)
 	$(CC) $(CFLAGS) -o test $(TESTSRC)
 	./test
 
+test_debug: $(TESTSRC)
+	$(CC) -g $(CFLAGS) -o test $(TESTSRC)
+	gdb ./test
+
 clean:
-	rm -f main test
+	rm -f main.exe test.exe
