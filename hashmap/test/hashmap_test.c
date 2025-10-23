@@ -67,7 +67,7 @@ void run_test(struct List *list) {
     while(current != NULL) {
         printf("Running test: %s\n", current->name);
         _run_test(current->f);
-        printf("Passed: %s\n", current->name);
+        printf("Passed: %s\n\n", current->name);
         current = current->next;
     }
 }
@@ -78,8 +78,8 @@ void put_a_key_value_then_get_the_value_by_giving_the_key(struct hashmap *map) {
     int value = 23;
     int res;
 
-    assert(put(map, key, value) == 0);
-    assert(get(map, key, &res) == 0);
+    assert(put(map, key, value) == SUCCESS);
+    assert(get(map, key, &res) == SUCCESS);
     assert(res == value);
 }
 
@@ -89,8 +89,8 @@ void put_a_key_bellow_zero_will_work(struct hashmap *map) {
     int value = 23;
     int res;
 
-    assert(put(map, key, value) == 0);
-    assert(get(map, key, &res) == 0);
+    assert(put(map, key, value) == SUCCESS);
+    assert(get(map, key, &res) == SUCCESS);
     assert(res == value);
 }
 
@@ -99,7 +99,7 @@ void get_a_key_unknow_will_fail(struct hashmap *map) {
     int key = 0;
     int res = -1;
 
-    assert(get(map, key, &res) == -2);
+    assert(get(map, key, &res) == KEY_UNKNOW);
     assert(res == -1);
 
 }
@@ -112,15 +112,12 @@ void put_a_key_then_del_give_the_value(struct hashmap *map) {
 
     put(map, key, value);
 
-    assert(del(map, key, &res) == 0);
+    assert(del(map, key, &res) == SUCCESS);
     assert(res == value);
-    assert(get(map, key, NULL) == -2);
-
-    free_hashmap(map);
+    assert(get(map, key, NULL) == KEY_UNKNOW);
 }
 
 int main() {
-    printf("Welcome to the hashmap test\n");
 
     struct List tests;
     setup(&tests);
