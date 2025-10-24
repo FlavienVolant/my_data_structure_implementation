@@ -73,6 +73,89 @@ int put_a_key_then_del_give_the_value(void *params) {
     return 0;
 }
 
+int put_same_key_replace_the_value(void *params) {
+    struct hashmap *map = params;
+
+    int key = 42;
+    int old_value = 100;
+    int new_value = 200;
+    int res;
+
+    ASSERT_EQUALS(put(map, key, old_value), SUCCESS);
+    ASSERT_EQUALS(put(map, key, new_value), SUCCESS);
+    ASSERT_EQUALS(get(map, key, &res), SUCCESS);
+    ASSERT_EQUALS(res, new_value);
+
+    return 0;
+}
+
+int del_on_unknown_key_do_nothing(void *params) {
+    struct hashmap *map = params;
+
+    int key = 999;
+    int res = 123;
+
+    ASSERT_EQUALS(del(map, key, &res), KEY_UNKNOW);
+    ASSERT_EQUALS(res, 123);
+
+    return 0;
+}
+
+int insert_multiple_keys_and_retrieve_all(void *params) {
+    struct hashmap *map = params;
+
+    for (int i = 0; i < 10; ++i) {
+        ASSERT_EQUALS(put(map, i, i * 10), SUCCESS);
+    }
+
+    int res;
+    for (int i = 0; i < 10; ++i) {
+        ASSERT_EQUALS(get(map, i, &res), SUCCESS);
+        ASSERT_EQUALS(res, i * 10);
+    }
+
+    return 0;
+}
+
+int insert_and_delete_multiple_keys(void *params) {
+    struct hashmap *map = params;
+
+    for (int i = 0; i < 5; ++i) {
+        ASSERT_EQUALS(put(map, i, i + 100), SUCCESS);
+    }
+
+    int res;
+    for (int i = 0; i < 3; ++i) {
+        ASSERT_EQUALS(del(map, i, &res), SUCCESS);
+        ASSERT_EQUALS(res, i + 100);
+        ASSERT_EQUALS(get(map, i, NULL), KEY_UNKNOW);
+    }
+
+    for (int i = 3; i < 5; ++i) {
+        ASSERT_EQUALS(get(map, i, &res), SUCCESS);
+        ASSERT_EQUALS(res, i + 100);
+    }
+
+    return 0;
+}
+
+int stress_test_many_insertions(void *params) {
+    struct hashmap *map = params;
+
+    const int N = 1000;
+    for (int i = 0; i < N; ++i) {
+        ASSERT_EQUALS(put(map, i, i * 2), SUCCESS);
+    }
+
+    int res;
+    for (int i = 0; i < N; ++i) {
+        ASSERT_EQUALS(get(map, i, &res), SUCCESS);
+        ASSERT_EQUALS(res, i * 2);
+    }
+
+    return 0;
+}
+
 int main() {
 
     struct TestList *tests = create_test_list();
@@ -81,6 +164,12 @@ int main() {
     ADD_TEST(tests, put_a_key_bellow_zero_will_work);
     ADD_TEST(tests, get_a_key_unknow_do_nothing);
     ADD_TEST(tests, put_a_key_then_del_give_the_value);
+
+    ADD_TEST(tests, put_same_key_replace_the_value);
+    ADD_TEST(tests, del_on_unknown_key_do_nothing);
+    ADD_TEST(tests, insert_multiple_keys_and_retrieve_all);
+    ADD_TEST(tests, insert_and_delete_multiple_keys);
+    ADD_TEST(tests, stress_test_many_insertions);
 
     run_tests(tests, beforeEach, afterEach);
 
