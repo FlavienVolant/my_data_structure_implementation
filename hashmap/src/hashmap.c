@@ -25,7 +25,7 @@ void free_hashmap(struct hashmap *map)
 }
 
 unsigned int hash(struct hashmap *map, int key) {
-    return (unsigned int) key % map->capacity;
+    return (key * key + 1) % map->capacity;
 }
 
 enum HashMapReturnValue put(struct hashmap *map, int key, int value)
