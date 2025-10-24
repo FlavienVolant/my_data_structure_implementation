@@ -7,6 +7,7 @@
 struct Hashmap {
     int capacity;
     int loadFactor;
+    int keyCount;
     struct Node **table;
 };
 
@@ -25,6 +26,7 @@ struct Hashmap* init_hashmap();
 enum HashMapReturnValue put(struct Hashmap *map, int key, int value);
 enum HashMapReturnValue get(struct Hashmap *map, int key, int *res);
 enum HashMapReturnValue del(struct Hashmap *map, int key, int *res);
+struct Node* get_keys_as_array(struct Hashmap *map, int *count);
 void free_hashmap(struct Hashmap *map);
 
 #endif

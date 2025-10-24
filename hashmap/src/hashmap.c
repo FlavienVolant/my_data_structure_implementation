@@ -9,6 +9,7 @@ struct Hashmap *init_hashmap()
     map->capacity = DEFAULT_CAPACITY;
     map->loadFactor = DEFAULT_LOAD_FACTOR;
 
+    map->keyCount = 0;
     map->table = malloc(sizeof(struct Node*) * map->capacity);
     
     for(int i = 0; i < map->capacity; i++) {
@@ -18,8 +19,8 @@ struct Hashmap *init_hashmap()
     return map;
 }
 
-unsigned int hash(struct Hashmap *map, int key) {
-    return (key * key + 1) % map->capacity;
+unsigned int hash(int map_capacity, int key) {
+    return (key * key + 1) % map_capacity;
 }
 
 struct Node* createNode(int key, int value) {
@@ -32,24 +33,32 @@ struct Node* createNode(int key, int value) {
     return new;
 }
 
+void resize(struct Hashmap *map) {
+    // todo
+}
+
+
+
 enum HashMapReturnValue put(struct Hashmap *map, int key, int value)
 {
-    unsigned int hash_key = hash(map, key);
+    unsigned int hash_key = hash(map->capacity, key);
     struct Node **current = &map->table[hash_key];
     while (*current != NULL) {
         if ((*current)->key == key) {
             (*current)->value = value;
+            map->keyCount++;
             return SUCCESS;
         }
         current = &(*current)->next;
     }
     *current = createNode(key, value);
+    map->keyCount++;
     return SUCCESS;
 }
 
 enum HashMapReturnValue get(struct Hashmap *map, int key, int *res)
 {
-    unsigned int hash_key = hash(map, key);
+    unsigned int hash_key = hash(map->capacity, key);
 
     struct Node *head = map->table[hash_key];
 
@@ -68,7 +77,7 @@ enum HashMapReturnValue get(struct Hashmap *map, int key, int *res)
 
 enum HashMapReturnValue del(struct Hashmap *map, int key, int *res)
 {
-    unsigned int hash_key = hash(map, key);
+    unsigned int hash_key = hash(map->capacity, key);
     
     struct Node *before = NULL;
     struct Node *head = map->table[hash_key];
@@ -82,6 +91,9 @@ enum HashMapReturnValue del(struct Hashmap *map, int key, int *res)
                 map->table[hash_key] = head->next;
             else
                 before->next = head->next;
+            
+            map->keyCount--;
+
             return SUCCESS;
         }
         before = head;
@@ -91,17 +103,44 @@ enum HashMapReturnValue del(struct Hashmap *map, int key, int *res)
     return KEY_UNKNOW;
 }
 
+struct Node* get_keys_as_array(struct Hashmap *map, int *count)
+{
+    *count = map->keyCount;
+
+    if(map->keyCount == 0)
+        return NULL;
+
+    struct Node *res = malloc(sizeof(struct Node) * map->keyCount);
+
+    int key_count = 0;
+    for (int i = 0; i < map->capacity; i++) {
+        struct Node *current = map->table[i];
+        while (current != NULL) {
+            res[key_count].key = current->key;
+            res[key_count].value = current->value;
+            res[key_count].next = NULL;
+            key_count++;
+            current = current->next;
+        }
+    }
+
+    return res;
+}
+
 void free_node(struct Node *head) {
-    if (head == NULL)
-        return;
-    
-    free_node(head->next);
-    free(head);
+    struct Node *current = head;
+    while (current != NULL) {
+        struct Node *tmp = current;
+        current = current->next;
+        free(tmp);
+    }
 }
 
 void free_hashmap(struct Hashmap *map)
 {
-    free_node(map->table[0]);
+    for(int i = 0; i < map->capacity; i++) {
+        free_node(map->table[i]);
+    }
     free(map->table);
     free(map);
 }

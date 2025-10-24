@@ -156,6 +156,53 @@ int stress_test_many_insertions(void *params) {
     return 0;
 }
 
+int get_keys_return_all_keys(void *params) {
+    struct Hashmap *map = params;
+
+    int keys_to_insert[] = {5, -3, 42, 0, 9999};
+    int num_keys = sizeof(keys_to_insert) / sizeof(keys_to_insert[0]);
+    for (int i = 0; i < num_keys; ++i) {
+        ASSERT_EQUALS(put(map, keys_to_insert[i], i * 10), SUCCESS);
+    }
+
+    int count = 0;
+    struct Node *keys = get_keys_as_array(map, &count);
+
+    ASSERT_EQUALS(count, num_keys);
+
+    int found_flags[num_keys];
+    for (int i = 0; i < num_keys; ++i) found_flags[i] = 0;
+
+    for (int i = 0; i < count; ++i) {
+        for (int j = 0; j < num_keys; ++j) {
+            if (keys[i].key == keys_to_insert[j]) {
+                found_flags[j] = 1;
+                break;
+            }
+        }
+    }
+
+    for (int i = 0; i < num_keys; ++i) {
+        ASSERT_TRUE(found_flags[i] == 1);
+    }
+
+    free(keys);
+
+    return 0;
+}
+
+int get_keys_empty_map(void *params) {
+    struct Hashmap *map = params;
+    int count = 0;
+    struct Node *keys = get_keys_as_array(map, &count);
+
+    ASSERT_EQUALS(count, 0);
+    ASSERT_TRUE(keys == NULL);
+
+    return 0;
+}
+
+
 int main() {
 
     struct TestList *tests = create_test_list();
@@ -170,6 +217,9 @@ int main() {
     ADD_TEST(tests, insert_multiple_keys_and_retrieve_all);
     ADD_TEST(tests, insert_and_delete_multiple_keys);
     ADD_TEST(tests, stress_test_many_insertions);
+
+    ADD_TEST(tests, get_keys_return_all_keys);
+    ADD_TEST(tests, get_keys_empty_map);
 
     run_tests(tests, beforeEach, afterEach);
 
