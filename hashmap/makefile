@@ -4,6 +4,8 @@ CFLAGS = -Wall -Wextra -Iinclude -I../c_unit/include
 SRC = src/main.c src/hashmap.c
 TESTSRC = test/hashmap_test.c src/hashmap.c ../c_unit/src/c_unit.c
 
+.PHONY: all run clean test test_debug
+
 all: main
 
 main: $(SRC)
