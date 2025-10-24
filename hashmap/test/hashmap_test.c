@@ -15,7 +15,7 @@ void afterEach(void* map) {
 
 int put_a_key_value_then_get_the_value_by_giving_the_key(void *params) {
 
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     int key = 5;
     int value = 23;
@@ -30,7 +30,7 @@ int put_a_key_value_then_get_the_value_by_giving_the_key(void *params) {
 
 int put_a_key_bellow_zero_will_work(void *params) {
 
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     int key = - 5;
     int value = 23;
@@ -45,7 +45,7 @@ int put_a_key_bellow_zero_will_work(void *params) {
 
 int get_a_key_unknow_do_nothing(void *params) {
 
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     int key = 0;
     int res = -1;
@@ -58,7 +58,7 @@ int get_a_key_unknow_do_nothing(void *params) {
 
 int put_a_key_then_del_give_the_value(void *params) {
 
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     int key = 0;
     int value = 0;
@@ -74,7 +74,7 @@ int put_a_key_then_del_give_the_value(void *params) {
 }
 
 int put_same_key_replace_the_value(void *params) {
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     int key = 42;
     int old_value = 100;
@@ -90,7 +90,7 @@ int put_same_key_replace_the_value(void *params) {
 }
 
 int del_on_unknown_key_do_nothing(void *params) {
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     int key = 999;
     int res = 123;
@@ -102,7 +102,7 @@ int del_on_unknown_key_do_nothing(void *params) {
 }
 
 int insert_multiple_keys_and_retrieve_all(void *params) {
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     for (int i = 0; i < 10; ++i) {
         ASSERT_EQUALS(put(map, i, i * 10), SUCCESS);
@@ -118,7 +118,7 @@ int insert_multiple_keys_and_retrieve_all(void *params) {
 }
 
 int insert_and_delete_multiple_keys(void *params) {
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     for (int i = 0; i < 5; ++i) {
         ASSERT_EQUALS(put(map, i, i + 100), SUCCESS);
@@ -140,7 +140,7 @@ int insert_and_delete_multiple_keys(void *params) {
 }
 
 int stress_test_many_insertions(void *params) {
-    struct hashmap *map = params;
+    struct Hashmap *map = params;
 
     const int N = 1000;
     for (int i = 0; i < N; ++i) {

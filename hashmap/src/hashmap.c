@@ -2,70 +2,106 @@
 
 #include <stdlib.h>
 
-struct hashmap *init_hashmap()
+struct Hashmap *init_hashmap()
 {
-    struct hashmap *map = malloc(sizeof(struct hashmap));
+    struct Hashmap *map = malloc(sizeof(struct Hashmap));
 
     map->capacity = DEFAULT_CAPACITY;
     map->loadFactor = DEFAULT_LOAD_FACTOR;
 
-    map->values = malloc(sizeof(int) * map->capacity);
-
-    for(int i = 0; i < map->capacity; i ++) {
-        map->values[i] = VALUE_EMPTY;
+    map->table = malloc(sizeof(struct Node*) * map->capacity);
+    
+    for(int i = 0; i < map->capacity; i++) {
+        map->table[i] = NULL;
     }
-
+    
     return map;
 }
 
-void free_hashmap(struct hashmap *map)
-{
-    free(map->values);
-    free(map);
-}
-
-unsigned int hash(struct hashmap *map, int key) {
+unsigned int hash(struct Hashmap *map, int key) {
     return (key * key + 1) % map->capacity;
 }
 
-enum HashMapReturnValue put(struct hashmap *map, int key, int value)
+struct Node* createNode(int key, int value) {
+    struct Node *new = malloc(sizeof(struct Node));
+
+    new->key = key;
+    new->value = value;
+    new->next = NULL;
+
+    return new;
+}
+
+enum HashMapReturnValue put(struct Hashmap *map, int key, int value)
 {
     unsigned int hash_key = hash(map, key);
-
-    map->values[hash_key] = value;
-
+    struct Node **current = &map->table[hash_key];
+    while (*current != NULL) {
+        if ((*current)->key == key) {
+            (*current)->value = value;
+            return SUCCESS;
+        }
+        current = &(*current)->next;
+    }
+    *current = createNode(key, value);
     return SUCCESS;
 }
 
-enum HashMapReturnValue get(struct hashmap *map, int key, int *res)
+enum HashMapReturnValue get(struct Hashmap *map, int key, int *res)
 {
     unsigned int hash_key = hash(map, key);
 
-    int val = map->values[hash_key];
+    struct Node *head = map->table[hash_key];
 
-    if(val == VALUE_EMPTY)
-        return KEY_UNKNOW;
+    while(head != NULL) {
+        if(head->key == key) {
+            if(res != NULL)
+                *res = head->value;
 
+            return SUCCESS;
+        }
+        head = head->next;
+    }
 
-    if(res != NULL)
-        *res = val;
-
-    return SUCCESS;
+    return KEY_UNKNOW;
 }
 
-enum HashMapReturnValue del(struct hashmap *map, int key, int *res)
+enum HashMapReturnValue del(struct Hashmap *map, int key, int *res)
 {
     unsigned int hash_key = hash(map, key);
     
-    int val = map -> values[hash_key];
+    struct Node *before = NULL;
+    struct Node *head = map->table[hash_key];
 
-    if(val == VALUE_EMPTY)
-        return KEY_UNKNOW;
+    while(head != NULL) {
+        if(head->key == key) {
+            if(res != NULL)
+                *res = head->value;
 
-    map -> values[hash_key] = VALUE_EMPTY;
+            if(before == NULL)
+                map->table[hash_key] = head->next;
+            else
+                before->next = head->next;
+            return SUCCESS;
+        }
+        before = head;
+        head = head->next;
+    }
+
+    return KEY_UNKNOW;
+}
+
+void free_node(struct Node *head) {
+    if (head == NULL)
+        return;
     
-    if(res != NULL)
-        *res = val;
+    free_node(head->next);
+    free(head);
+}
 
-    return SUCCESS;
+void free_hashmap(struct Hashmap *map)
+{
+    free_node(map->table[0]);
+    free(map->table);
+    free(map);
 }
