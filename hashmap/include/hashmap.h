@@ -2,7 +2,7 @@
 #define HASHMAP_H
 
 #define DEFAULT_CAPACITY 256
-#define DEFAULT_LOAD_FACTOR 0.75
+#define DEFAULT_LOAD_FACTOR 75
 
 struct Hashmap {
     int capacity;

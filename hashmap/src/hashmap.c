@@ -19,6 +19,24 @@ struct Hashmap *init_hashmap()
     return map;
 }
 
+void free_node(struct Node *head) {
+    struct Node *current = head;
+    while (current != NULL) {
+        struct Node *tmp = current;
+        current = current->next;
+        free(tmp);
+    }
+}
+
+void free_hashmap(struct Hashmap *map)
+{
+    for(int i = 0; i < map->capacity; i++) {
+        free_node(map->table[i]);
+    }
+    free(map->table);
+    free(map);
+}
+
 unsigned int hash(int map_capacity, int key) {
     return (key * key + 1) % map_capacity;
 }
@@ -34,13 +52,35 @@ struct Node* createNode(int key, int value) {
 }
 
 void resize(struct Hashmap *map) {
-    // todo
+
+    int count;
+    struct Node *keys = get_keys_as_array(map, &count);
+
+    for(int i = 0; i < map->capacity; i++) {
+        free_node(map->table[i]);
+    }
+
+    map->capacity *= 2;
+    map->table = realloc(map->table, sizeof(struct Node *) * map->capacity);
+
+    for(int i = 0; i < map->capacity; i++) {
+        map->table[i] = NULL;
+    }
+
+    map->keyCount = 0;
+
+    for(int i = 0; i < count; i++) {
+        put(map, keys[i].key, keys[i].value);
+    }
+
+    free(keys);
 }
-
-
 
 enum HashMapReturnValue put(struct Hashmap *map, int key, int value)
 {
+    if ((float)map->keyCount / map->capacity * 100 >= map->loadFactor)
+        resize(map);
+
     unsigned int hash_key = hash(map->capacity, key);
     struct Node **current = &map->table[hash_key];
     while (*current != NULL) {
@@ -53,6 +93,7 @@ enum HashMapReturnValue put(struct Hashmap *map, int key, int value)
     }
     *current = createNode(key, value);
     map->keyCount++;
+
     return SUCCESS;
 }
 
@@ -125,22 +166,4 @@ struct Node* get_keys_as_array(struct Hashmap *map, int *count)
     }
 
     return res;
-}
-
-void free_node(struct Node *head) {
-    struct Node *current = head;
-    while (current != NULL) {
-        struct Node *tmp = current;
-        current = current->next;
-        free(tmp);
-    }
-}
-
-void free_hashmap(struct Hashmap *map)
-{
-    for(int i = 0; i < map->capacity; i++) {
-        free_node(map->table[i]);
-    }
-    free(map->table);
-    free(map);
 }

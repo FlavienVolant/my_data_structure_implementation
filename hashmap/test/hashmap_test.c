@@ -193,7 +193,7 @@ int get_keys_return_all_keys(void *params) {
 
 int get_keys_empty_map(void *params) {
     struct Hashmap *map = params;
-    int count = 0;
+    int count;
     struct Node *keys = get_keys_as_array(map, &count);
 
     ASSERT_EQUALS(count, 0);
